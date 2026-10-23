@@ -1,0 +1,30 @@
+# Secrets
+.env
+.env.*
+!.env.example
+!.env.test.example
+
+# Node.js / Next.js
+node_modules/
+frontend/.next/
+frontend/out/
+
+# Go
+backend/bin/
+backend/*.exe
+backend/coverage.out
+
+# Solidity tooling
+contracts/artifacts/
+contracts/cache/
+contracts/node_modules/
+
+# Local data
+uploads/
+*.log
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
