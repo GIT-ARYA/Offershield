@@ -2474,3 +2474,82 @@ textarea:focus-visible {
     transform: none !important;
   }
 }
+
+
+/* ------------------------------
+   Scan results
+------------------------------ */
+.scan-results {
+  margin-top: 22px;
+  padding: 22px;
+  border: 1px solid var(--glass-border);
+  border-radius: 18px;
+  background: linear-gradient(145deg, rgba(115, 135, 205, 0.09), rgba(112, 231, 193, 0.035));
+  animation: message-arrive 420ms cubic-bezier(.2,.8,.2,1) both;
+}
+.results-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.results-eyebrow {
+  color: var(--green);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+.results-heading h3 { margin: 8px 0 6px; font-size: 22px; letter-spacing: -0.7px; }
+.results-heading p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.7; }
+.risk-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+.risk-pulse { width: 7px; height: 7px; border-radius: 50%; background: currentColor; box-shadow: 0 0 10px currentColor; }
+.risk-high { color: #ff818b; background: rgba(255, 91, 107, .1); border-color: rgba(255, 91, 107, .3); }
+.risk-medium { color: #f3c66f; background: rgba(243, 198, 111, .09); border-color: rgba(243, 198, 111, .28); }
+.risk-low { color: var(--green); background: rgba(112, 231, 193, .08); border-color: rgba(112, 231, 193, .25); }
+.risk-unknown { color: var(--muted); }
+.scan-id { margin: 14px 0 0; color: var(--subtle); font-size: 10px; overflow-wrap: anywhere; }
+.scan-id code { color: var(--muted); }
+.results-section-title { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 23px 0 12px; }
+.results-section-title h4 { margin: 0; font-size: 12px; letter-spacing: .1px; }
+.results-section-title > span { color: var(--muted); font-size: 9px; font-weight: 800; letter-spacing: .8px; }
+.finding-list { display: grid; gap: 10px; }
+.finding-card { padding: 14px; border: 1px solid var(--glass-border); border-radius: 13px; background: var(--glass); }
+.finding-topline { display: flex; align-items: center; gap: 10px; }
+.finding-number { display: grid; place-items: center; width: 27px; height: 27px; flex-shrink: 0; border-radius: 9px; background: var(--card-hover); color: var(--blue); font-size: 9px; font-weight: 800; }
+.finding-topline h5 { margin: 0; flex: 1; font-size: 12px; text-transform: capitalize; }
+.severity-pill { padding: 5px 8px; border-radius: 7px; font-size: 9px; font-weight: 800; text-transform: uppercase; }
+.severity-high { color: #ff9ca4; background: rgba(255, 91, 107, .12); }
+.severity-medium { color: #f3c66f; background: rgba(243, 198, 111, .11); }
+.severity-low { color: var(--green); background: rgba(112, 231, 193, .1); }
+.finding-evidence { margin: 12px 0 0; padding: 10px 12px; border-left: 2px solid var(--purple); border-radius: 0 8px 8px 0; background: var(--input-bg); color: var(--text); font-size: 11px; line-height: 1.7; overflow-wrap: anywhere; }
+.finding-explanation { margin: 10px 0 0; color: var(--muted); font-size: 11px; line-height: 1.8; }
+.no-findings { display: flex; gap: 10px; padding: 14px; border: 1px solid rgba(112, 231, 193, .2); border-radius: 12px; color: var(--green); background: rgba(112, 231, 193, .06); }
+.no-findings > span { font-weight: 800; }
+.no-findings p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.7; }
+.recommendations-panel { margin-top: 4px; }
+.recommendations-panel .results-section-title > span { color: var(--green); }
+.recommendations-panel ul { list-style: none; display: grid; gap: 10px; padding: 0; margin: 0; }
+.recommendations-panel li { display: flex; align-items: flex-start; gap: 9px; color: var(--muted); font-size: 11px; line-height: 1.7; }
+.recommendations-panel li > span { color: var(--green); font-weight: 800; }
+.results-disclaimer { margin: 20px 0 0; padding-top: 14px; border-top: 1px solid var(--glass-border); color: var(--subtle); font-size: 10px; line-height: 1.8; }
+.theme-light .finding-card { background: rgba(255, 255, 255, .38); }
+.theme-light .finding-evidence { background: rgba(255, 255, 255, .45); }
+@media (max-width: 560px) {
+  .scan-results { padding: 16px; }
+  .results-heading { flex-direction: column; }
+  .risk-pill { align-self: flex-start; }
+  .finding-topline { flex-wrap: wrap; }
+  .finding-topline h5 { min-width: 60%; }
+}

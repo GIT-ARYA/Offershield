@@ -7,6 +7,20 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 type Theme = "dark" | "light";
 type ApiStatus = "checking" | "connected" | "offline";
+type ScanFinding = {
+  type?: string;
+  severity?: string;
+  evidence?: string;
+  explanation?: string;
+};
+type ScanPayload = {
+  message?: string;
+  error?: string;
+  scan_id?: string;
+  risk_level?: string;
+  findings?: ScanFinding[];
+  recommendations?: string[];
+};
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
@@ -18,6 +32,7 @@ export default function Home() {
   const [isChecking, setIsChecking] = useState(false);
   const [scanMessage, setScanMessage] = useState("");
   const [scanError, setScanError] = useState(false);
+  const [scanResult, setScanResult] = useState<ScanPayload | null>(null);
 
   const statusText =
     apiStatus === "connected"
@@ -40,16 +55,20 @@ export default function Home() {
     setIsChecking(true);
     setScanMessage("");
     setScanError(false);
+    setScanResult(null);
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/v1/scans`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: trimmedText }),
+        body: JSON.stringify({
+  content: trimmedText,
+  type: "job_offer",
+}),
       });
 
       const responseText = await response.text();
-      let payload: { message?: string; error?: string; result?: unknown } = {};
+      let payload: ScanPayload = {};
 
       if (responseText) {
         try {
@@ -70,9 +89,10 @@ export default function Home() {
         );
       }
 
+      setScanResult(payload);
       setScanMessage(
         payload.message ||
-          "The backend accepted your message. Review its returned analysis before making a decision."
+          "Analysis complete. Review the findings below and verify the opportunity independently."
       );
     } catch (error) {
       setScanError(true);
@@ -132,7 +152,7 @@ export default function Home() {
     gsap.registerPlugin(ScrollTrigger);
     const media = gsap.matchMedia();
 
-    media.add("(prefers-reduced-motion: no-preference)", () => {
+    media.add("(min-width: 761px)", () => {
       // Crisp, staggered entrance for the original hero. The shield artwork
       // and its existing float animation are intentionally left untouched.
       const heroItems = gsap.utils.toArray<HTMLElement>(
@@ -222,7 +242,7 @@ export default function Home() {
       // horizontal journey: content near the viewport centre is crisp, while
       // content approaching the top/bottom edges softly falls out of focus.
       const verticalFocusItems = gsap.utils.toArray<HTMLElement>(
-        ".hero-copy, .hero-visual, .checker-section .section-heading, .checker-card, .disclaimer, .how-section .section-heading, .step-card, .final-cta"
+        ".hero-copy, .hero-visual, .checker-section .section-heading, .disclaimer, .how-section .section-heading"
       );
       const updateVerticalFocus = () => {
         const centerY = window.innerHeight * 0.5;
@@ -683,6 +703,7 @@ export default function Home() {
                 setOfferText(event.target.value);
                 setScanMessage("");
                 setScanError(false);
+                setScanResult(null);
               }}
             />
 
@@ -726,6 +747,69 @@ export default function Home() {
                 <span>{scanError ? "!" : "✓"}</span>
                 <p>{scanMessage}</p>
               </div>
+            )}
+
+            {scanResult && (
+              <section className="scan-results" aria-labelledby="scan-results-title" aria-live="polite">
+                <div className="results-heading">
+                  <div>
+                    <span className="results-eyebrow">SCAN COMPLETE</span>
+                    <h3 id="scan-results-title">Your analysis</h3>
+                    <p>Rule-based signals found in the message you submitted.</p>
+                  </div>
+                  <span className={`risk-pill risk-${(scanResult.risk_level || "unknown").toLowerCase()}`}>
+                    <span className="risk-pulse" />
+                    {(scanResult.risk_level || "Unknown risk").replace(/_/g, " ")} risk
+                  </span>
+                </div>
+
+                {scanResult.scan_id && (
+                  <p className="scan-id">Scan reference: <code>{scanResult.scan_id}</code></p>
+                )}
+
+                <div className="results-section-title">
+                  <h4>Detected warning signs</h4>
+                  <span>{scanResult.findings?.length ?? 0} found</span>
+                </div>
+
+                {scanResult.findings && scanResult.findings.length > 0 ? (
+                  <div className="finding-list">
+                    {scanResult.findings.map((finding, index) => (
+                      <article className="finding-card" key={`${finding.type || "finding"}-${index}`}>
+                        <div className="finding-topline">
+                          <span className="finding-number">{String(index + 1).padStart(2, "0")}</span>
+                          <h5>{(finding.type || "Warning sign").replace(/_/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase())}</h5>
+                          <span className={`severity-pill severity-${(finding.severity || "medium").toLowerCase()}`}>
+                            {finding.severity || "Review"}
+                          </span>
+                        </div>
+                        {finding.evidence && <blockquote className="finding-evidence">“{finding.evidence}”</blockquote>}
+                        {finding.explanation && <p className="finding-explanation">{finding.explanation}</p>}
+                      </article>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="no-findings">
+                    <span>✓</span>
+                    <p>No warning signs were flagged by the current rules. This does not guarantee the message is legitimate.</p>
+                  </div>
+                )}
+
+                {scanResult.recommendations && scanResult.recommendations.length > 0 && (
+                  <div className="recommendations-panel">
+                    <div className="results-section-title">
+                      <h4>Recommended next steps</h4>
+                      <span>STAY SAFE</span>
+                    </div>
+                    <ul>
+                      {scanResult.recommendations.map((recommendation, index) => (
+                        <li key={`${index}-${recommendation}`}><span>✓</span>{recommendation}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                <p className="results-disclaimer">This is a preliminary rule-based assessment, not a definitive scam determination. Confirm the employer and contact details independently.</p>
+              </section>
             )}
 
             <div className="checker-status">
